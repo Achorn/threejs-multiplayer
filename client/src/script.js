@@ -1,15 +1,28 @@
 import * as THREE from "three";
 import { io } from "socket.io-client";
 
-const socket = io("http://10.0.0.239:8080");
+// needs to be manually updated right now
+const socket = io("http://192.168.4.25:8080");
 const boxes = {};
 
 //where we will display our 3d
 const canvas = document.querySelector("canvas.webgl");
 
+window.addEventListener("resize", (e) => {
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+
+  //camera ratio
+  camera.aspect = sizes.width / sizes.height;
+  camera.updateProjectionMatrix();
+
+  // render
+  renderer.setSize(sizes.width, sizes.height);
+});
+
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
 
 const scene = new THREE.Scene();
@@ -21,14 +34,6 @@ const floor = new THREE.Mesh(
 
 floor.position.y = -1;
 scene.add(floor);
-// const box1 = new THREE.Mesh(
-//   new THREE.BoxGeometry(1, 1, 1),
-//   new THREE.MeshBasicMaterial({ color: "pink" })
-// );
-// box1.position.x = Math.floor(Math.random() * 15) - 7;
-// box1.position.z = Math.floor(Math.random() * 15) - 7;
-
-// scene.add(box1);
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -49,20 +54,15 @@ const renderer = new THREE.WebGLRenderer({
 });
 
 renderer.setSize(sizes.width, sizes.height);
-
+renderer.setPixelRatio(window.devicePixelRatio || 2);
 renderer.render(scene, camera);
 
 const friendInWay = (x, z) => {
   for (const [id, friend] of Object.entries(boxes)) {
-    if (x == friend.position.x && z == friend.position.z) {
-      console.log("friend in way");
-      // console.log(position, friendPosition);
-      return true;
-    }
-
-    return false;
+    return x == friend.position.x && z == friend.position.z ? true : false;
   }
 };
+
 const getInput = (object) => {
   document.addEventListener("keydown", (e) => {
     switch (e.key) {
@@ -168,6 +168,7 @@ socket.on("friend left", (id) => {
 
 const tick = () => {
   renderer.render(scene, camera);
+
   window.requestAnimationFrame(tick);
 };
 

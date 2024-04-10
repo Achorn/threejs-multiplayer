@@ -1,0 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  overflow: hidden;
+}
+
+.webgl {
+  /* aparently gets rid of scrollbar */
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  /* gets rid of highlighting */
+  outline: none;
+}
